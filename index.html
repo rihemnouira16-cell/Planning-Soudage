@@ -69,6 +69,13 @@ td select{max-width:170px}
 .lk{border:0;background:none;color:var(--mut);text-decoration:underline}
 @media (prefers-reduced-motion:reduce){.rg,.bigb{animation:none}.lg span,.tag,.go{animation-duration:.01s;animation-delay:0s}.ln{animation-duration:.01s;animation-delay:0s}}
 .mut{color:var(--mut)}
+.gg{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.gc{padding:12px 14px}.gc svg,.gs svg{width:100%;height:auto;display:block}
+.gt{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.gt b{font-size:17px}
+.lgd{display:flex;flex-wrap:wrap;gap:6px 18px;color:var(--mut);font-size:13px;margin:6px 0 12px}
+.lgd i{display:inline-block;vertical-align:-2px;margin-right:6px}
+svg text{fill:var(--mut);font:500 10px "Barlow Semi Condensed",system-ui,sans-serif}
+svg .vl{fill:var(--ink);font-weight:700}
 #sp,#im{background:transparent;color:#fff;--mut:rgba(255,255,255,.72);--ink:#fff;--acc:#da1f3d;--card:#fff;--accb:rgba(255,255,255,.12);--brand:#ff4d63;--line:rgba(255,255,255,.3)}
 .lgs{width:min(72vw,540px);height:auto;overflow:visible}
 #bk{position:fixed;inset:0;z-index:49;background:radial-gradient(ellipse at 12% 0%,rgba(218,31,61,.6),transparent 55%),radial-gradient(ellipse at 100% 100%,rgba(218,31,61,.38),transparent 52%),linear-gradient(160deg,#1c1819 0%,#2b1318 55%,#4a0f1c 100%)}
@@ -128,12 +135,13 @@ td select{max-width:170px}
 <label>Famille<select id="ff" autocomplete="off"></select></label>
 <label>Sous-famille<select id="fs" autocomplete="off"></select></label>
 <label>Type de produit<select id="ft" autocomplete="off"><option value="">Tous</option><option>PF</option><option>SF</option><option>FANTOME</option></select></label>
-<button id="ib" class="p" title="Importer les fichiers Excel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>Importer les fichiers</button><input type="file" id="imp" multiple accept=".xlsx,.xls" hidden><button id="ac" class="p" disabled title="Recalculer le planning avec les fichiers importés"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5"/></svg>Actualiser</button><button id="xl" class="hide" title="Télécharger tout le planning en Excel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></svg>Exporter en Excel</button><button id="rs">Réinitialiser les affectations</button>
+<button id="ib" class="p" title="Importer les fichiers Excel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>Importer les fichiers</button><input type="file" id="imp" multiple accept=".xlsx,.xls" hidden><button id="ac" class="p" disabled title="Recalculer le planning avec les fichiers importés"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5"/></svg>Actualiser</button><button id="xl" class="hide" title="Télécharger tout le planning en Excel"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></svg>Exporter en Excel</button><button id="vl" class="p" title="Valider la charge et afficher les courbes par machine"><span id="vlt">Valider le planning</span></button><button id="rs">Réinitialiser les affectations</button>
 </div>
 <p class="sub" id="st" style="padding:0 24px"></p>
 <p class="sub" id="sy" style="padding:0 24px;margin:0 0 6px"></p>
 <div class="kpi" id="kpi"></div>
-<main><div class="card ml" id="ml"></div><div class="card det" id="det"></div></main>
+<main id="mn"><div class="card ml" id="ml"></div><div class="card det" id="det"></div></main>
+<section id="gr" class="hide" style="padding:0 24px 32px"></section>
 <p class="ft">Charge = encours (quantité lancée − sortie soudage) × temps de soudage (colonne TPS du fichier Machine). Pour les articles fantômes, la date de soudage est celle d’engagement moins 1 jour ouvré (J-1, dimanche exclu). Quand une machine dépasse sa capacité, les articles ayant une 2ᵉ machine dans le fichier Machine sont scindés automatiquement : la machine 1 est complétée, le reste va sur la machine 2.</p>
 </div>
 <script>
@@ -185,6 +193,7 @@ h+=all?'':ex>.01?`<div class="alert">Surcharge de ${fmt(ex)} min : réaffectez d
 h+=`<div class="tw"><table><thead><tr><th>Soudage le</th><th>Engagement</th><th>Type</th><th>OF</th><th>Article</th><th class="n">Qté lancée</th><th class="n">Sortie soudage</th><th class="n">Encours (à produire)</th><th class="n">Tps (min)</th><th class="n">Charge (min)</th><th>Machine</th></tr></thead><tbody>`;
 let pd='';h+=rows.map(o=>(o.ds!==pd?(pd=o.ds,`<tr class="gh"><td colspan=11>Soudage ${dd(o.ds)} : ${rows.filter(r=>r.ds===o.ds).length} OF · ${fmt(rows.filter(r=>r.ds===o.ds).reduce((s,r)=>s+r.q*r.t,0))} min</td></tr>`):'')+`<tr class="${o.a!==o.m1||o.sp?'chg':''}"><td class="d">${dd(o.ds)}</td><td class="ds">${dd(o.de)}</td><td><span class="t ${o.ty}">${o.ty}</span></td><td>${o.of}${o.sp?' <span class="t SF">scindé</span>':''}<div class="ds">Semaine ${o.sem}</div></td><td><b>${o.code}</b><div class="ds">${o.des}</div><div class="ds">${o.fa}${o.sf&&o.sf!==o.fa?' › '+o.sf:''}</div></td><td class="n mut">${fmt(o.ql)}</td><td class="n mut">${fmt(o.so)}</td><td class="n"><b>${fmt(o.q)}</b></td><td class="n">${o.t||'<b style="color:var(--bad)" title="Temps (TPS) manquant dans le fichier Machine">0 ⚠</b>'}</td><td class="n">${fmt(o.q*o.t)}</td><td><select data-i="${o.i}">${M.map(m=>`<option value="${m}" ${m===o.a?'selected':''}>${m}${m===o.m1?' (initiale)':o.ms.includes(m)?' (alternative)':''} – ${Math.round((load(m))/C*100)} %</option>`).join('')}</select></td></tr>`).join('')||`<tr><td colspan=11 class="mut">Aucune ligne pour le filtre « ${ft||'Tous'} ». Choisissez « Tous » dans Type de produit.</td></tr>`;
 $('det').innerHTML=h+'</tbody></table></div>';
+viewSw();
 }
 $('ml').onclick=e=>{const b=e.target.closest('.mi');if(b){sel=b.dataset.m;render()}};
 $('det').onchange=e=>{if(e.target.dataset.i){const o=O[e.target.dataset.i],k=o.of+'|'+o.code,v=e.target.value;if(v===o.m1)delete OV[k];else OV[k]=v;mk();auto();render();shareOv()}};
@@ -250,6 +259,31 @@ const tm=setTimeout(()=>sy('Données partagées inaccessibles pour le moment.'),
 db.doc('planning/data').onSnapshot(s=>{clearTimeout(tm);if(!s.exists){sy('● Partage actif : aucune mise à jour enregistrée pour l’instant.');return}
 const d=s.data();if(d.upd!==lastUpd){lastUpd=d.upd;applyData(d);render()}sy('● Partagé avec l’équipe · mis à jour le '+new Date(d.upd).toLocaleString('fr-FR'))},()=>sy('Synchronisation interrompue.'));
 db.doc('planning/ov').onSnapshot(s=>{if(!s.exists)return;const d=s.data();if(d.upd!==lastOv){lastOv=d.upd;OV=Object.fromEntries(d.ov||[]);mk();auto();render()}},()=>{})}catch(e){}})();
+let GV=false;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function viewSw(){$('mn').classList.toggle('hide',GV);$('gr').classList.toggle('hide',!GV);$('vlt').textContent=GV?'Modifier le planning':'Valider le planning';if(GV)renderGraphs()}
+const tk=m=>{const s=Math.pow(10,Math.floor(Math.log10(m/3))),k=[1,2,2.5,5,10].find(x=>m/(x*s)<=5)||10;return k*s};
+function renderGraphs(){const C=cap(),dd=[...new Set(O.map(o=>o.ds))].sort(),ds=[];
+for(let d=new Date(dd[0]+'T12:00:00Z');d.toISOString().slice(0,10)<=dd[dd.length-1];d.setUTCDate(d.getUTCDate()+1))if(d.getUTCDay()!==0)ds.push(d.toISOString().slice(0,10));
+const L=M.map(m=>({m,l:load(m),n:O.filter(o=>o.a===m).length})).sort((a,b)=>ord(a.m,b.m));
+const ax=(W,H,l,t,b,mx,r)=>{const st=tk(mx);let s='';for(let v=0;v<=mx;v+=st){const y=t+(H-t-b)*(1-v/mx);s+=`<line x1="${l}" x2="${W-r}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${l-6}" y="${y+3}" text-anchor="end">${fmt(v)}</text>`}return s};
+const dm=s=>s.slice(8,10)+'/'+s.slice(5,7);
+// histogramme global
+{const W=1000,H=330,l=58,r=112,t=26,b=62,mx=Math.max(C,...L.map(x=>x.l))*1.12,pw=W-l-r,bw=pw/L.length,y=v=>t+(H-t-b)*(1-v/mx);
+let s=ax(W,H,l,t,b,mx,r);
+L.forEach((x,i)=>{const cx=l+bw*i+bw/2,h=(H-t-b)*x.l/mx;s+=`<rect x="${cx-bw*.32}" y="${y(x.l)}" width="${bw*.64}" height="${h}" rx="2" style="fill:${x.l>C+.01?'var(--bad)':'var(--mut)'}"/><text class="vl" x="${cx}" y="${y(x.l)-5}" text-anchor="middle">${Math.round(x.l/C*100)}%</text><text x="${cx}" y="${H-b+14}" text-anchor="end" transform="rotate(-40 ${cx} ${H-b+14})">${esc(x.m)}</text>`});
+s+=`<line x1="${l}" x2="${W-r}" y1="${y(C)}" y2="${y(C)}" stroke="var(--ink)" stroke-dasharray="6 4" stroke-width="1.5"/><text class="vl" x="${W-r+8}" y="${y(C)+4}" text-anchor="start">Capacité ${fmt(C)} min</text>`;
+var sum=`<div class="card gc gs"><div class="gt"><b>Charge par machine</b><span class="mut">${fmt(L.reduce((a,x)=>a+x.l,0))} min au total</span></div><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Histogramme de la charge par machine">${s}</svg></div>`}
+// courbes par machine
+const cards=L.filter(x=>x.n).map(x=>{const W=360,H=200,l=48,r=12,t=16,b=36,rows=O.filter(o=>o.a===x.m);
+const day=ds.map(d=>rows.filter(o=>o.ds===d).reduce((a,o)=>a+o.q*o.t,0));let c=0;const cu=day.map(v=>c+=v);
+const mx=Math.max(C,c,...day)*1.1,pw=W-l-r,bw=pw/ds.length,y=v=>t+(H-t-b)*(1-v/mx);let s=ax(W,H,l,t,b,mx,r);
+ds.forEach((d,i)=>{const cx=l+bw*i+bw/2,h=(H-t-b)*day[i]/mx;s+=`<rect x="${cx-bw*.3}" y="${y(day[i])}" width="${bw*.6}" height="${h}" rx="2" style="fill:var(--mut);opacity:.75"/><text x="${cx}" y="${H-b+13}" text-anchor="middle">${dm(d)}</text>`});
+s+=`<line x1="${l}" x2="${W-r}" y1="${y(C)}" y2="${y(C)}" stroke="var(--ink)" stroke-dasharray="5 4" stroke-width="1.3"/>`;
+s+=`<polyline fill="none" stroke="var(--brand)" stroke-width="2.4" stroke-linejoin="round" points="${cu.map((v,i)=>(l+bw*i+bw/2)+','+y(v)).join(' ')}"/>`+cu.map((v,i)=>`<circle cx="${l+bw*i+bw/2}" cy="${y(v)}" r="2.6" style="fill:var(--brand)"/>`).join('');
+return `<div class="card gc"><div class="gt"><b>${esc(x.m)}</b><span style="font-weight:700;color:${x.l>C+.01?'var(--bad)':'var(--ink)'}">${Math.round(x.l/C*100)} % · ${fmt(x.l)} / ${fmt(C)} min</span></div><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Charge de la machine ${esc(x.m)} par jour">${s}</svg></div>`}).join('');
+$('gr').innerHTML=`<div class="dh" style="margin:6px 0 4px"><h2 style="margin:0;font-size:24px">Planning validé : charge par machine</h2></div><div class="lgd"><span><i style="width:12px;height:12px;background:var(--mut);opacity:.75;border-radius:2px"></i>Charge du jour (min)</span><span><i style="width:18px;height:3px;background:var(--brand)"></i>Charge cumulée</span><span><i style="width:18px;border-top:2px dashed var(--ink);height:0"></i>Capacité de la machine</span><span><i style="width:12px;height:12px;background:var(--bad);border-radius:2px"></i>Machine en surcharge</span></div>`+sum+`<div class="gg" style="margin-top:14px">${cards}</div>`}
+$('vl').onclick=()=>{GV=!GV;render();scrollTo(0,0)};
 (()=>{const c=$('cv'),x=c.getContext('2d'),red=matchMedia('(prefers-reduced-motion:reduce)').matches;let W,H,S=[];
 const rs=()=>{const d=devicePixelRatio||1;c.width=innerWidth*d;c.height=innerHeight*d;x.setTransform(d,0,0,d,0,0);W=innerWidth;H=innerHeight};rs();addEventListener('resize',rs);
 const t0=performance.now();
